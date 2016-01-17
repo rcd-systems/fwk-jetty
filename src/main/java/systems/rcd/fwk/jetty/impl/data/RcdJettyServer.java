@@ -10,9 +10,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -30,8 +32,14 @@ public class RcdJettyServer {
 
     final GzipHandler gzipHandler = new GzipHandler();
 
-    public RcdJettyServer(final int port) {
-        server = new Server(port);
+    public RcdJettyServer(final String host, final int port) {
+        server = new Server();
+
+        final ServerConnector connector = new ServerConnector(server);
+        connector.setHost(host);
+        connector.setPort(port);
+        server.setConnectors(new Connector[] { connector });
+
         gzipHandler.setHandler(contextHandlerCollection);
         server.setHandler(gzipHandler);
     }
@@ -53,7 +61,7 @@ public class RcdJettyServer {
             @Override
             public void handle(final String target, final Request baseRequest, final HttpServletRequest request,
                     final HttpServletResponse response)
-                    throws IOException, ServletException {
+                            throws IOException, ServletException {
                 try {
                     handler.handle(target, request, response);
                 } catch (final Exception e) {
