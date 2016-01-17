@@ -1,6 +1,7 @@
 package systems.rcd.fwk.jetty.impl.data;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -50,6 +51,10 @@ public class RcdJettyServer {
 
     public void stop() throws Exception {
         server.stop();
+    }
+
+    public URI getUri() {
+        return server.getURI();
     }
 
 }
