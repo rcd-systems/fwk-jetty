@@ -24,7 +24,8 @@ import org.eclipse.jetty.util.resource.Resource;
 
 import systems.rcd.fwk.core.log.RcdLogService;
 
-public class RcdJettyServer {
+public class RcdJettyServer
+{
 
     final Server server;
 
@@ -32,70 +33,88 @@ public class RcdJettyServer {
 
     final GzipHandler gzipHandler = new GzipHandler();
 
-    public RcdJettyServer(final String host, final int port) {
+    public RcdJettyServer( final String host, final int port )
+    {
         server = new Server();
 
-        final ServerConnector connector = new ServerConnector(server);
-        connector.setHost(host);
-        connector.setPort(port);
-        server.setConnectors(new Connector[] { connector });
+        final ServerConnector connector = new ServerConnector( server );
+        connector.setHost( host );
+        connector.setPort( port );
+        server.setConnectors( new Connector[]{connector} );
 
-        gzipHandler.setHandler(contextHandlerCollection);
-        server.setHandler(gzipHandler);
+        gzipHandler.setHandler( contextHandlerCollection );
+        server.setHandler( gzipHandler );
     }
 
-    public RcdJettyServer addResourceHandler(final String contextPath, final URL baseUri)
-            throws MalformedURLException, URISyntaxException {
+    public RcdJettyServer addResourceHandler( final String contextPath, final URL baseUri )
+        throws MalformedURLException, URISyntaxException
+    {
 
         final ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setDirectoriesListed(true); // TODO Remove
-        resourceHandler.setWelcomeFiles(new String[] { "index.html" });
-        resourceHandler.setBaseResource(Resource.newResource(baseUri));
+        resourceHandler.setDirectoriesListed( true ); // TODO Remove
+        resourceHandler.setWelcomeFiles( new String[]{"index.html"} );
+        resourceHandler.setBaseResource( Resource.newResource( baseUri ) );
 
-        addHandler(contextPath, resourceHandler);
+        addHandler( contextPath, resourceHandler );
         return this;
     }
 
-    public RcdJettyServer addHandler(final String contextPath, final RcdJettyHandler handler) {
-        addHandler(contextPath, new AbstractHandler() {
+    public RcdJettyServer addHandler( final String contextPath, final RcdJettyHandler handler )
+    {
+        addHandler( contextPath, new AbstractHandler()
+        {
             @Override
-            public void handle(final String target, final Request baseRequest, final HttpServletRequest request,
-                    final HttpServletResponse response)
-                            throws IOException, ServletException {
-                try {
-                    handler.handle(target, request, response);
-                } catch (final Exception e) {
-                    RcdLogService.error("Http request handle error for path '", e);
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                } finally {
-                    baseRequest.setHandled(true);
+            public void handle( final String target, final Request baseRequest, final HttpServletRequest request,
+                                final HttpServletResponse response )
+                throws IOException, ServletException
+            {
+                try
+                {
+                    handler.handle( target, request, response );
+                }
+                catch ( final Exception e )
+                {
+                    RcdLogService.error( "Http request handle error for path '", e );
+                    response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+                }
+                finally
+                {
+                    baseRequest.setHandled( true );
                 }
             }
-        });
+        } );
 
         return this;
     }
 
-    private void addHandler(final String contextPath, final Handler handler) {
-        final ContextHandler context = new ContextHandler(contextPath);
-        context.setHandler(handler);
-        contextHandlerCollection.addHandler(context);
+    private void addHandler( final String contextPath, final Handler handler )
+    {
+        final ContextHandler context = new ContextHandler( contextPath );
+        context.setHandler( handler );
+        contextHandlerCollection.addHandler( context );
     }
 
-    public RcdJettyServer start() throws Exception {
+    public RcdJettyServer start()
+        throws Exception
+    {
         server.start();
         return this;
     }
 
-    public void join() throws InterruptedException {
+    public void join()
+        throws InterruptedException
+    {
         server.join();
     }
 
-    public void stop() throws Exception {
+    public void stop()
+        throws Exception
+    {
         server.stop();
     }
 
-    public URI getUri() {
+    public URI getUri()
+    {
         return server.getURI();
     }
 
